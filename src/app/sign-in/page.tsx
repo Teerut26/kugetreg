@@ -12,6 +12,7 @@ import {
 } from "@mantine/core";
 import { IconLock, IconMail, IconUser } from "@tabler/icons-react";
 import { useParams } from "next/navigation";
+import Footer from "../_components/Footer";
 
 export default function Page() {
   const params = useParams<{ error: string }>();
@@ -62,6 +63,7 @@ export default function Page() {
             <Button size="md" type="submit" fullWidth>
               Sign in
             </Button>
+            <Footer />
           </form>
         </Stack>
       </Card>

@@ -4,6 +4,7 @@ import { AppShell, Burger, Group, ScrollArea } from "@mantine/core";
 import { useDisclosure, useMediaQuery } from "@mantine/hooks";
 import NavbarMenu from "../_components/NavbarMenu/NavbarMenu";
 import AccountNavbarMenu from "../_components/NavbarMenu/AccountNavbarMenu";
+import Footer from "@/app/_components/Footer";
 
 interface Props {
   children: React.ReactNode;
@@ -50,7 +51,10 @@ export default function MainLayout(props: Props) {
           <AccountNavbarMenu />
         </AppShell.Section>
       </AppShell.Navbar>
-      <AppShell.Main>{props.children}</AppShell.Main>
+      <AppShell.Main className="flex flex-col">
+        <div className="flex-grow">{props.children}</div>
+        <Footer />
+      </AppShell.Main>
     </AppShell>
   );
 }
