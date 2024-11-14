@@ -131,6 +131,7 @@ export const authConfig = {
       return refreshAccessToken(token);
     },
   },
+  trustHost: true,
   pages: {
     signIn: "/sign-in",
   },
