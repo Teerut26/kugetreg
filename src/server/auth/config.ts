@@ -6,8 +6,6 @@ import { AxiosError } from "axios";
 import { type Student } from "types/responses/ISignInServiceResponse";
 import { jwtDecode } from "jwt-decode";
 import { type IMYKUToken } from "types/IMYKUToken.type";
-import { axiosAPI } from "utils/axiosAPI";
-import { type IRenewTokenResponse } from "types/responses/IRenewTokenResponse";
 import getRefreshTokenService from "@/services/getRefreshToken.service";
 
 declare module "next-auth" {
@@ -124,7 +122,7 @@ export const authConfig = {
 
       const payload = jwtDecode<IMYKUToken>(token.access_token);
 
-      if (Date.now() < payload.exp) {
+      if (payload.exp * 1000 > Date.now()) {
         return token;
       }
 
