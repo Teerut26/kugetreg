@@ -1,10 +1,7 @@
 import {
   type Icon,
-  IconBuildingCommunity,
+  IconCalendarCheck,
   IconCalendarEvent,
-  IconDashboard,
-  IconHome,
-  IconUser,
 } from "@tabler/icons-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -20,19 +17,14 @@ interface NavigationItem {
 
 export const navigationItems: NavigationItem[] = [
   {
-    label: "Venues",
-    icon: IconBuildingCommunity,
-    link: "/venue",
+    label: "ตารางเรียน",
+    icon: IconCalendarEvent,
+    link: "/schedule",
   },
   {
-    label: "User",
-    icon: IconUser,
-    link: "/user-management",
-  },
-  {
-    label: "Facilities",
-    icon: IconHome,
-    link: "/facilitie",
+    label: "วางแผนตารางเรียน",
+    icon: IconCalendarCheck,
+    link: "/schedule-planner",
   },
 ];
 
@@ -40,7 +32,7 @@ export default function NavbarMenu(props: Props) {
   const pathname = usePathname();
 
   const isActive = (link: string) => {
-    return pathname.startsWith(link);
+    return pathname === link;
   };
 
   return (

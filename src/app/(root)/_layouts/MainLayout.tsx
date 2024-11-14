@@ -1,7 +1,7 @@
 "use client";
 
 import { AppShell, Burger, Group, ScrollArea } from "@mantine/core";
-import { useDisclosure } from "@mantine/hooks";
+import { useDisclosure, useMediaQuery } from "@mantine/hooks";
 import NavbarMenu from "../_components/NavbarMenu/NavbarMenu";
 import AccountNavbarMenu from "../_components/NavbarMenu/AccountNavbarMenu";
 
@@ -12,6 +12,7 @@ interface Props {
 export default function MainLayout(props: Props) {
   const [mobileOpened, { toggle: toggleMobile }] = useDisclosure();
   const [desktopOpened, { toggle: toggleDesktop }] = useDisclosure(true);
+  const isMobile = useMediaQuery("(max-width: 768px)");
   return (
     <AppShell
       header={{ height: 60 }}
@@ -36,7 +37,9 @@ export default function MainLayout(props: Props) {
             visibleFrom="sm"
             size="sm"
           />
-          <span className="text-xl font-bold text-blue-600">Admin Manager</span>
+          <span className="text-xl font-bold text-blue-600">
+            KU Get Reg {!isMobile && ": จัดตารางเรียน"}
+          </span>
         </Group>
       </AppShell.Header>
       <AppShell.Navbar>

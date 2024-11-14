@@ -1,55 +1,99 @@
-import { PrismaAdapter } from "@auth/prisma-adapter";
 import { type DefaultSession, type NextAuthConfig } from "next-auth";
-import DiscordProvider from "next-auth/providers/discord";
+import Credentials from "next-auth/providers/credentials";
+import { type JWT } from "next-auth/jwt";
+import SignInService from "@/services/sign-in.service";
+import { AxiosError } from "axios";
+import { type Student } from "types/responses/ISignInServiceResponse";
 
-import { db } from "@/server/db";
-
-/**
- * Module augmentation for `next-auth` types. Allows us to add custom properties to the `session`
- * object and keep type safety.
- *
- * @see https://next-auth.js.org/getting-started/typescript#module-augmentation
- */
 declare module "next-auth" {
   interface Session extends DefaultSession {
     user: {
-      id: string;
-      // ...other properties
-      // role: UserRole;
+      access_token: string;
+      student: Student;
     } & DefaultSession["user"];
   }
 
-  // interface User {
-  //   // ...other properties
-  //   // role: UserRole;
-  // }
+  interface User {
+    access_token: string;
+    student: Student;
+  }
 }
 
-/**
- * Options for NextAuth.js used to configure adapters, providers, callbacks, etc.
- *
- * @see https://next-auth.js.org/configuration/options
- */
+declare module "next-auth/jwt" {
+  interface JWT {
+    id: string;
+    access_token: string;
+    student: Student;
+  }
+}
+
 export const authConfig = {
   providers: [
-    DiscordProvider,
-    /**
-     * ...add more providers here.
-     *
-     * Most other providers require a bit more work than the Discord provider. For example, the
-     * GitHub provider requires you to add the `refresh_token_expires_in` field to the Account
-     * model. Refer to the NextAuth.js docs for the provider you want to use. Example:
-     *
-     * @see https://next-auth.js.org/providers/github
-     */
-  ],
-  callbacks: {
-    session: ({ session, user }) => ({
-      ...session,
-      user: {
-        ...session.user,
-        id: user.id,
+    Credentials({
+      name: "Credentials",
+      credentials: {
+        username: { label: "Username", type: "text", placeholder: "jsmith" },
+        password: { label: "Password", type: "password" },
+      },
+
+      async authorize(credentials) {
+        try {
+          const result = await SignInService({
+            username: credentials.username as string,
+            password: credentials.password as string,
+          });
+
+          return {
+            email: result.user.student.email,
+            access_token: result.accesstoken,
+            id: result.user.idCode,
+            name:
+              result.user.student.firstNameEn +
+              " " +
+              result.user.student.lastNameEn,
+            student: result.user.student,
+          };
+        } catch (error) {
+          if (error instanceof AxiosError) {
+            console.log("error", error);
+
+            return null;
+          }
+          console.log("error", error);
+          throw error;
+        }
       },
     }),
+  ],
+  callbacks: {
+    session: (session) => {
+      session.session.user.access_token = session.token.access_token;
+      session.session.user.email = session.token.email ?? "";
+      session.session.user.name = session.token.name;
+      session.session.user.id = session.token.id;
+      session.session.user.image = session.token.image as string;
+      return session.session;
+    },
+    async jwt({ user, token }) {
+      if (user) {
+        return {
+          access_token: user.access_token,
+          email: user.email,
+          name: user.name,
+          id: user.id,
+          image: user.image,
+          student: user.student,
+        } as JWT;
+      }
+      console.log("jwt", token);
+
+      return token;
+    },
+  },
+  pages: {
+    signIn: "/sign-in",
+  },
+  session: {
+    strategy: "jwt",
   },
 } satisfies NextAuthConfig;
