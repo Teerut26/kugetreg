@@ -1,16 +1,18 @@
 import { type IScheduleResponse } from "types/responses/IScheduleResponse";
 import { axiosAPIWithAuth } from "utils/axiosAPI";
+import { z } from "zod";
 
-interface Props {
-  stdStatusCode: string;
-  campusCode: string;
-  facultyCode: string;
-  majorCode: string;
-  userType: string;
-  token: string;
-}
+export const getScheduleSchema = z.object({
+  stdStatusCode: z.string(),
+  campusCode: z.string(),
+  facultyCode: z.string(),
+  majorCode: z.string(),
+  userType: z.string(),
+});
 
-const getSchedule = async (props: Props) => {
+export type GetScheduleInput = z.infer<typeof getScheduleSchema>;
+
+const getScheduleService = async (props: GetScheduleInput) => {
   try {
     const res = await axiosAPIWithAuth.get<IScheduleResponse>(
       `/common/getschedule?stdStatusCode=${props.stdStatusCode}&campusCode=${props.campusCode}&facultyCode=${props.facultyCode}&majorCode=${props.majorCode}&userType=${props.userType}`,
@@ -22,4 +24,4 @@ const getSchedule = async (props: Props) => {
   }
 };
 
-export default getSchedule;
+export default getScheduleService;

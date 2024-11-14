@@ -10,12 +10,14 @@ declare module "next-auth" {
     user: {
       access_token: string;
       student: Student;
+      userType: string;
     } & DefaultSession["user"];
   }
 
   interface User {
     access_token: string;
     student: Student;
+    userType: string;
   }
 }
 
@@ -24,6 +26,7 @@ declare module "next-auth/jwt" {
     id: string;
     access_token: string;
     student: Student;
+    userType: string;
   }
 }
 
@@ -52,6 +55,7 @@ export const authConfig = {
               " " +
               result.user.student.lastNameEn,
             student: result.user.student,
+            userType: result.user.userType,
           };
         } catch (error) {
           if (error instanceof AxiosError) {
@@ -72,6 +76,8 @@ export const authConfig = {
       session.session.user.name = session.token.name;
       session.session.user.id = session.token.id;
       session.session.user.image = session.token.image as string;
+      session.session.user.student = session.token.student;
+      session.session.user.userType = session.token.userType;
       return session.session;
     },
     async jwt({ user, token }) {
@@ -83,9 +89,9 @@ export const authConfig = {
           id: user.id,
           image: user.image,
           student: user.student,
+          userType: user.userType,
         } as JWT;
       }
-      console.log("jwt", token);
 
       return token;
     },
