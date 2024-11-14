@@ -1,7 +1,7 @@
 import { type DefaultSession, type NextAuthConfig } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import { type JWT } from "next-auth/jwt";
-import SignInService from "@/services/sign-in.service";
+import SignInService from "@/services/signIn.service";
 import { AxiosError } from "axios";
 import { type Student } from "types/responses/ISignInServiceResponse";
 

@@ -16,6 +16,7 @@ export const env = createEnv({
       .enum(["development", "test", "production"])
       .default("development"),
     MYKU_PUBLIC_KEY: z.string(),
+    MYKU_APP_KEY: z.string(),
   },
 
   /**
@@ -36,6 +37,7 @@ export const env = createEnv({
     DATABASE_URL: process.env.DATABASE_URL,
     NODE_ENV: process.env.NODE_ENV,
     MYKU_PUBLIC_KEY: process.env.MYKU_PUBLIC_KEY,
+    MYKU_APP_KEY: process.env.MYKU_APP_KEY,
   },
   /**
    * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation. This is especially
