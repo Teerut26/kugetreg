@@ -4,11 +4,17 @@ import { type JWT } from "next-auth/jwt";
 import SignInService from "@/services/signIn.service";
 import { AxiosError } from "axios";
 import { type Student } from "types/responses/ISignInServiceResponse";
+import { jwtDecode } from "jwt-decode";
+import { type IMYKUToken } from "types/IMYKUToken.type";
+import { axiosAPI } from "utils/axiosAPI";
+import { type IRenewTokenResponse } from "types/responses/IRenewTokenResponse";
+import getRefreshTokenService from "@/services/getRefreshToken.service";
 
 declare module "next-auth" {
   interface Session extends DefaultSession {
     user: {
       access_token: string;
+      refresh_token: string;
       student: Student;
       userType: string;
     } & DefaultSession["user"];
@@ -16,6 +22,7 @@ declare module "next-auth" {
 
   interface User {
     access_token: string;
+    refresh_token: string;
     student: Student;
     userType: string;
   }
@@ -25,9 +32,28 @@ declare module "next-auth/jwt" {
   interface JWT {
     id: string;
     access_token: string;
+    refresh_token: string;
     student: Student;
     userType: string;
   }
+}
+
+async function refreshAccessToken(oldJWT: JWT): Promise<JWT> {
+  try {
+    const res = await getRefreshTokenService({
+      refreshToken: oldJWT.refresh_token,
+    });
+    return {
+      ...oldJWT,
+      access_token: res.accesstoken,
+    };
+  } catch (error) {
+    if (error instanceof AxiosError) {
+      console.log("error", error.response?.data);
+      return oldJWT;
+    }
+  }
+  return oldJWT;
 }
 
 export const authConfig = {
@@ -49,6 +75,7 @@ export const authConfig = {
           return {
             email: result.user.student.email,
             access_token: result.accesstoken,
+            refresh_token: result.renewtoken,
             id: result.user.idCode,
             name:
               result.user.student.firstNameEn +
@@ -72,6 +99,7 @@ export const authConfig = {
   callbacks: {
     session: (session) => {
       session.session.user.access_token = session.token.access_token;
+      session.session.user.refresh_token = session.token.refresh_token;
       session.session.user.email = session.token.email ?? "";
       session.session.user.name = session.token.name;
       session.session.user.id = session.token.id;
@@ -84,6 +112,7 @@ export const authConfig = {
       if (user) {
         return {
           access_token: user.access_token,
+          refresh_token: user.refresh_token,
           email: user.email,
           name: user.name,
           id: user.id,
@@ -93,7 +122,13 @@ export const authConfig = {
         } as JWT;
       }
 
-      return token;
+      const payload = jwtDecode<IMYKUToken>(token.access_token);
+
+      if (Date.now() < payload.exp) {
+        return token;
+      }
+
+      return refreshAccessToken(token);
     },
   },
   pages: {

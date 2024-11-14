@@ -1,4 +1,5 @@
-import { type IScheduleResponse } from "types/responses/IScheduleResponse";
+import { type BaseApiStructure } from "types/responses/IBaseApiStructure";
+import { type IGroupCourseResponse } from "types/responses/IGroupCourseResponse";
 import { axiosAPIWithAuth } from "utils/axiosAPI";
 import { z } from "zod";
 
@@ -12,7 +13,9 @@ export type GetGroupCourseInput = z.infer<typeof getGroupCourseSchema>;
 
 const getGroupCourseService = async (props: GetGroupCourseInput) => {
   try {
-    const res = await axiosAPIWithAuth.get<IScheduleResponse>(
+    const res = await axiosAPIWithAuth.get<
+      BaseApiStructure<IGroupCourseResponse[]>
+    >(
       `/std-profile/getGroupCourse?academicYear=${props.academicYear}&semester=${props.semester}&stdId=${props.stdId}`,
     );
 

@@ -1,18 +1,11 @@
 import { auth } from "@/server/auth";
 import getSchedule from "@/services/getSchedule.service";
+import { api } from "@/trpc/server";
 
 export default async function Page() {
   const session = await auth();
-
-  const getScheduleResponse = await getSchedule({
-    campusCode: session?.user.student.campusCode ?? "",
-    facultyCode: session?.user.student.facultyCode ?? "",
-    majorCode: session?.user.student.majorCode ?? "",
-    stdStatusCode: session?.user.student.studentStatusCode ?? "",
-    userType: session?.user.userType ?? "",
-  });
-
-  console.log(getScheduleResponse);
-
-  return <div>Page</div>;
+  const apiRoute = await api.common.getSchedule()
+  console.log(apiRoute);
+  
+  return <div className="w-full whitespace-pre-wrap">{session?.user.access_token}</div>;
 }

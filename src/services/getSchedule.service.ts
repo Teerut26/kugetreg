@@ -1,3 +1,4 @@
+import { type BaseApiStructure } from "types/responses/IBaseApiStructure";
 import { type IScheduleResponse } from "types/responses/IScheduleResponse";
 import { axiosAPIWithAuth } from "utils/axiosAPI";
 import { z } from "zod";
@@ -14,7 +15,7 @@ export type GetScheduleInput = z.infer<typeof getScheduleSchema>;
 
 const getScheduleService = async (props: GetScheduleInput) => {
   try {
-    const res = await axiosAPIWithAuth.get<IScheduleResponse>(
+    const res = await axiosAPIWithAuth.get<BaseApiStructure<IScheduleResponse[]>>(
       `/common/getschedule?stdStatusCode=${props.stdStatusCode}&campusCode=${props.campusCode}&facultyCode=${props.facultyCode}&majorCode=${props.majorCode}&userType=${props.userType}`,
     );
 

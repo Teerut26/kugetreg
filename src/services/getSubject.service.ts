@@ -1,4 +1,5 @@
-import { type IScheduleResponse } from "types/responses/IScheduleResponse";
+import { BaseApiStructure } from "types/responses/IBaseApiStructure";
+import { type ISubjectResponse } from "types/responses/ISubjectResponse";
 import { axiosAPIWithAuth } from "utils/axiosAPI";
 import { z } from "zod";
 
@@ -14,7 +15,7 @@ export type GetSubjectInput = z.infer<typeof GetSubjectSchema>;
 
 const getSubjectService = async (props: GetSubjectInput) => {
   try {
-    const res = await axiosAPIWithAuth.get<IScheduleResponse>(
+    const res = await axiosAPIWithAuth.get<BaseApiStructure<ISubjectResponse[]>>(
       `/enroll/openSubjectForEnroll?query=${props.query}&academicYear=${props.academicYear}&semester=${props.semester}&campusCode=${props.campusCode}&section=${props.section}`,
     );
 
